@@ -11,342 +11,1171 @@
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg-start: #0f0c29;
-    --bg-mid: #1a1a3e;
-    --bg-end: #24243e;
-    --glass-bg: rgba(255, 255, 255, 0.06);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --glass-hover: rgba(255, 255, 255, 0.10);
-    --text-primary: rgba(255, 255, 255, 0.92);
+    /* Dark base */
+    --bg-deep: #08060e;
+    --bg-surface: #0d0b14;
+
+    /* Glass */
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-hover: rgba(255, 255, 255, 0.07);
+
+    /* Text */
+    --text-primary: rgba(255, 255, 255, 0.95);
     --text-secondary: rgba(255, 255, 255, 0.55);
-    --text-tertiary: rgba(255, 255, 255, 0.35);
-    --accent-1: #a78bfa;
-    --accent-2: #60a5fa;
-    --accent-3: #34d399;
-    --accent-4: #f97316;
-    --accent-5: #f472b6;
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    --radius: 20px;
+    --text-tertiary: rgba(255, 255, 255, 0.30);
+
+    /* Default accent (overridden per domain) */
+    --accent: #a78bfa;
+    --accent-dim: rgba(167, 139, 250, 0.15);
+    --accent-glow: rgba(167, 139, 250, 0.06);
+
+    /* Layout */
+    --sidebar-width: 76px;
+    --sidebar-icon-size: 44px;
+    --transition-smooth: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, var(--bg-start), var(--bg-mid), var(--bg-end));
+    background: var(--bg-deep);
     color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
+    height: 100vh;
+    overflow: hidden;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Animated background orbs */
-  .bg-orbs {
+  /* ─── Background Layer ─── */
+  .bg-layer {
     position: fixed;
     inset: 0;
     z-index: 0;
     overflow: hidden;
+  }
+
+  .bg-ambient {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.2s ease, background 1.2s ease;
+  }
+  .bg-ambient.active { opacity: 1; }
+  .bg-ambient.default-active { opacity: 1; background: radial-gradient(ellipse at 30% 20%, rgba(167,139,250,0.08) 0%, transparent 60%),
+                                                           radial-gradient(ellipse at 70% 80%, rgba(96,165,250,0.06) 0%, transparent 60%); }
+
+  /* Per-domain ambients */
+  .bg-ambient[data-domain="watch"]  { background: radial-gradient(ellipse at 20% 30%, rgba(251,191,36,0.12) 0%, transparent 55%),
+                                                 radial-gradient(ellipse at 80% 70%, rgba(251,146,60,0.06) 0%, transparent 55%); }
+  .bg-ambient[data-domain="kitchen"]{ background: radial-gradient(ellipse at 25% 25%, rgba(251,146,60,0.14) 0%, transparent 55%),
+                                                 radial-gradient(ellipse at 75% 75%, rgba(234,88,12,0.06) 0%, transparent 55%); }
+  .bg-ambient[data-domain="masks"]  { background: radial-gradient(ellipse at 30% 20%, rgba(167,139,250,0.14) 0%, transparent 55%),
+                                                 radial-gradient(ellipse at 70% 80%, rgba(139,92,246,0.06) 0%, transparent 55%); }
+  .bg-ambient[data-domain="brain"]  { background: radial-gradient(ellipse at 25% 30%, rgba(96,165,250,0.14) 0%, transparent 55%),
+                                                 radial-gradient(ellipse at 75% 70%, rgba(59,130,246,0.06) 0%, transparent 55%); }
+  .bg-ambient[data-domain="read"]   { background: radial-gradient(ellipse at 20% 25%, rgba(52,211,153,0.12) 0%, transparent 55%),
+                                                 radial-gradient(ellipse at 80% 75%, rgba(16,185,129,0.06) 0%, transparent 55%); }
+  .bg-ambient[data-domain="world"]  { background: radial-gradient(ellipse at 30% 30%, rgba(244,114,182,0.12) 0%, transparent 55%),
+                                                 radial-gradient(ellipse at 70% 70%, rgba(236,72,153,0.06) 0%, transparent 55%); }
+
+  /* Floating particles */
+  .particles {
+    position: absolute;
+    inset: 0;
     pointer-events: none;
   }
-  .bg-orbs .orb {
+  .particle {
     position: absolute;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.35;
-    animation: float 20s ease-in-out infinite;
+    background: var(--accent);
+    opacity: 0;
+    animation: particle-float 8s ease-in-out infinite;
+    transition: background 0.8s ease;
+    filter: blur(1px);
   }
-  .bg-orbs .orb:nth-child(1) {
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, #a78bfa, transparent 70%);
-    top: -10%; left: -10%;
-    animation-duration: 25s;
-  }
-  .bg-orbs .orb:nth-child(2) {
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, #60a5fa, transparent 70%);
-    bottom: -15%; right: -5%;
-    animation-duration: 30s;
-    animation-delay: -5s;
-  }
-  .bg-orbs .orb:nth-child(3) {
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, #34d399, transparent 70%);
-    top: 40%; right: 30%;
-    animation-duration: 22s;
-    animation-delay: -10s;
+  .particle:nth-child(1) { width: 3px; height: 3px; left: 15%; top: 20%; animation-delay: 0s; animation-duration: 12s; }
+  .particle:nth-child(2) { width: 2px; height: 2px; left: 45%; top: 60%; animation-delay: -3s; animation-duration: 10s; }
+  .particle:nth-child(3) { width: 4px; height: 4px; left: 70%; top: 30%; animation-delay: -6s; animation-duration: 14s; }
+  .particle:nth-child(4) { width: 2px; height: 2px; left: 25%; top: 75%; animation-delay: -2s; animation-duration: 11s; }
+  .particle:nth-child(5) { width: 3px; height: 3px; left: 85%; top: 50%; animation-delay: -5s; animation-duration: 13s; }
+  .particle:nth-child(6) { width: 2px; height: 2px; left: 55%; top: 15%; animation-delay: -8s; animation-duration: 9s; }
+  .particle.visible { opacity: 0.3; }
+
+  @keyframes particle-float {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.15; }
+    25% { transform: translate(10px, -15px) scale(1.2); opacity: 0.4; }
+    50% { transform: translate(-5px, 8px) scale(0.9); opacity: 0.2; }
+    75% { transform: translate(12px, 5px) scale(1.1); opacity: 0.35; }
   }
 
-  @keyframes float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    25% { transform: translate(30px, -40px) scale(1.05); }
-    50% { transform: translate(-20px, 20px) scale(0.95); }
-    75% { transform: translate(15px, 35px) scale(1.02); }
-  }
-
-  .container {
+  /* ─── Layout ─── */
+  .launcher {
     position: relative;
     z-index: 1;
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 60px 24px 80px;
+    display: flex;
+    height: 100vh;
   }
 
-  /* Header */
-  .header {
-    text-align: center;
-    margin-bottom: 64px;
+  /* ─── Sidebar ─── */
+  .sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
   }
 
-  .header .domain {
+  .sidebar-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-family: 'Georgia', serif;
-    font-size: 3.5rem;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(96,165,250,0.1));
+    border: 1px solid rgba(167,139,250,0.2);
+    margin-bottom: 16px;
+    cursor: default;
+    flex-shrink: 0;
+  }
+
+  .sidebar-divider {
+    width: 28px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 6px 0 10px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-icon {
+    position: relative;
+    width: var(--sidebar-icon-size);
+    height: var(--sidebar-icon-size);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    background: transparent;
+    border: 1px solid transparent;
+    flex-shrink: 0;
+  }
+
+  .sidebar-icon::after {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%) scaleY(0);
+    width: 3px;
+    height: 20px;
+    border-radius: 0 3px 3px 0;
+    background: var(--accent);
+    transition: transform var(--transition-fast), background 0.3s ease;
+  }
+
+  .sidebar-icon:hover {
+    background: var(--glass-hover);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.08);
+  }
+
+  .sidebar-icon.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .sidebar-icon.active::after {
+    transform: translateY(-50%) scaleY(1);
+  }
+
+  /* Tooltip */
+  .sidebar-icon .tooltip {
+    position: absolute;
+    left: calc(100% + 14px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-6px);
+    background: rgba(13, 11, 20, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all var(--transition-fast);
+    z-index: 100;
+  }
+  .sidebar-icon:hover .tooltip {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .sidebar-spacer { flex: 1; }
+
+  /* Status indicator in sidebar */
+  .sidebar-icon .status-pip {
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-deep);
+  }
+  .status-pip.live { background: #34d399; }
+  .status-pip.soon { background: #fbbf24; }
+
+  /* ─── Main Content ─── */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Top bar */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.01);
+    flex-shrink: 0;
+  }
+
+  .top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .top-bar-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    transition: color 0.4s ease;
+  }
+
+  .top-bar-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }
+
+  .top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(167,139,250,0.3), rgba(96,165,250,0.2));
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+  }
+
+  /* ─── Domain View ─── */
+  .domain-view {
+    flex: 1;
+    display: flex;
+    padding: 32px;
+    gap: 28px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+  }
+  .domain-view.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Hero / Art panel */
+  .domain-hero {
+    flex: 1.3;
+    border-radius: 20px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(24px) saturate(1.3);
+    -webkit-backdrop-filter: blur(24px) saturate(1.3);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 32px;
+    transition: border-color 0.4s ease, box-shadow 0.6s ease;
+  }
+
+  .domain-hero:hover {
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .domain-hero-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.3;
+    transition: opacity 0.8s ease, background 0.8s ease;
+    z-index: 0;
+  }
+
+  .domain-hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .domain-hero-name {
+    font-family: 'Georgia', serif;
+    font-size: 2.8rem;
     font-weight: 400;
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+    line-height: 1.1;
+    margin-bottom: 8px;
+    transition: color 0.4s ease;
+  }
+
+  .domain-hero-desc {
+    font-size: 0.95rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    max-width: 420px;
+    margin-bottom: 20px;
+  }
+
+  .launch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    border: 1px solid var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    backdrop-filter: blur(8px);
+  }
+
+  .launch-btn:hover {
+    background: var(--accent);
+    color: var(--bg-deep);
+    box-shadow: 0 0 30px var(--accent-glow), 0 0 60px var(--accent-glow);
+    transform: translateY(-1px);
+  }
+
+  .launch-btn .launch-arrow {
+    font-size: 1rem;
+    transition: transform var(--transition-fast);
+  }
+  .launch-btn:hover .launch-arrow {
+    transform: translateX(3px);
+  }
+
+  .launch-btn.coming-soon {
+    border-color: rgba(251,191,36,0.4);
+    background: rgba(251,191,36,0.08);
+    color: rgba(251,191,36,0.7);
+    cursor: default;
+  }
+  .launch-btn.coming-soon:hover {
+    background: rgba(251,191,36,0.08);
+    color: rgba(251,191,36,0.7);
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* ─── Preview Panel ─── */
+  .preview-panel {
+    flex: 0.7;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 280px;
+  }
+
+  .preview-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    padding: 20px;
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+
+  .preview-card:hover {
+    border-color: rgba(255,255,255,0.12);
+    background: var(--glass-hover);
+  }
+
+  .preview-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .preview-card-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-tertiary);
+  }
+
+  .preview-card-count {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    transition: all 0.3s ease;
+  }
+
+  .preview-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+  }
+  .preview-item:last-child { border-bottom: none; }
+  .preview-item:hover { color: var(--text-primary); }
+
+  .preview-item-icon {
+    font-size: 1rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .preview-item-text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .preview-item-meta {
+    font-size: 0.72rem;
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .stat-item {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    backdrop-filter: blur(16px);
+    padding: 16px;
+    text-align: center;
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+
+  .stat-item:hover {
+    border-color: rgba(255,255,255,0.12);
+    background: var(--glass-hover);
+  }
+
+  .stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+    transition: color 0.3s ease;
+  }
+
+  .stat-label {
+    font-size: 0.68rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+  }
+
+  /* ─── Default (no selection) View ─── */
+  .default-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+    transition: opacity var(--transition-smooth);
+  }
+
+  .default-view.hidden {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+  }
+
+  .default-title {
+    font-family: 'Georgia', serif;
+    font-size: 4rem;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.6) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 12px;
   }
 
-  .header .tagline {
+  .default-subtitle {
     font-size: 1.05rem;
     font-weight: 300;
     color: var(--text-secondary);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
+    margin-bottom: 32px;
   }
 
-  /* App Grid */
-  .app-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
-  }
-
-  /* Glass Card */
-  .app-card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
-    padding: 32px 28px;
-    backdrop-filter: blur(20px) saturate(1.2);
-    -webkit-backdrop-filter: blur(20px) saturate(1.2);
-    box-shadow: var(--shadow);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .app-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .app-card:hover {
-    background: var(--glass-hover);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 60px rgba(167, 139, 250, 0.08);
-  }
-
-  .app-card:hover::before {
-    opacity: 1;
-  }
-
-  /* Icon */
-  .app-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
+  .default-hint {
+    font-size: 0.78rem;
+    color: var(--text-tertiary);
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 1.6rem;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 1;
+    gap: 8px;
   }
 
-  .app-card-body {
-    flex: 1;
-    position: relative;
-    z-index: 1;
+  .default-hint .arrow-left {
+    animation: hint-bounce 2s ease-in-out infinite;
   }
 
-  .app-name {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 6px;
-    letter-spacing: -0.01em;
+  @keyframes hint-bounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-6px); }
   }
 
-  .app-desc {
-    font-size: 0.88rem;
-    font-weight: 300;
-    line-height: 1.55;
-    color: var(--text-secondary);
+  /* ─── Activity visualization (mini bar chart) ─── */
+  .activity-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 40px;
+    margin-top: 12px;
   }
 
-  .app-url {
+  .activity-bar {
+    width: 6px;
+    border-radius: 3px 3px 0 0;
+    transition: height 0.4s ease, background 0.3s ease;
+  }
+
+  /* ─── Clock ─── */
+  .clock {
     font-size: 0.78rem;
     font-weight: 400;
     color: var(--text-tertiary);
-    font-family: 'Inter', monospace;
-    letter-spacing: 0.01em;
-    margin-top: auto;
-    position: relative;
-    z-index: 1;
+    font-variant-numeric: tabular-nums;
   }
 
-  .app-card:hover .app-url {
-    color: var(--accent-1);
+  /* ─── Responsive ─── */
+  @media (max-width: 900px) {
+    :root { --sidebar-width: 60px; --sidebar-icon-size: 38px; }
+    .domain-view { flex-direction: column; padding: 16px; gap: 16px; }
+    .domain-hero { min-height: 200px; }
+    .preview-panel { min-width: unset; }
+    .domain-hero-name { font-size: 2rem; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
   }
 
-  /* Status badge */
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 3px 8px;
-    border-radius: 6px;
-    position: relative;
-    z-index: 1;
-  }
-  .status-live {
-    background: rgba(52, 211, 153, 0.15);
-    color: #34d399;
-  }
-  .status-soon {
-    background: rgba(251, 191, 36, 0.15);
-    color: #fbbf24;
-  }
-  .status-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-  .status-live .status-dot { background: #34d399; animation: pulse-live 2s ease-in-out infinite; }
-  .status-soon .status-dot { background: #fbbf24; }
-
-  @keyframes pulse-live {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  /* Footer */
-  .footer {
-    text-align: center;
-    margin-top: 64px;
-    color: var(--text-tertiary);
-    font-size: 0.82rem;
-    font-weight: 300;
-    letter-spacing: 0.02em;
-  }
-
-  /* Responsive */
   @media (max-width: 640px) {
-    .header .domain { font-size: 2.4rem; }
-    .header { margin-bottom: 40px; }
-    .container { padding: 40px 16px 60px; }
-    .app-grid { gap: 16px; }
-    .app-card { padding: 24px 20px; }
+    :root { --sidebar-width: 52px; --sidebar-icon-size: 34px; }
+    .top-bar { padding: 12px 16px; }
+    .top-bar-title { font-size: 1.1rem; }
+    .domain-view { padding: 12px; }
+    .domain-hero-name { font-size: 1.6rem; }
+    .preview-panel { min-width: unset; }
+    .default-title { font-size: 2.4rem; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
   }
+
+  /* ─── Scrollbar ─── */
+  .preview-panel { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+  .preview-panel::-webkit-scrollbar { width: 4px; }
+  .preview-panel::-webkit-scrollbar-track { background: transparent; }
+  .preview-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
 </style>
 </head>
 <body>
 
-<div class="bg-orbs">
-  <div class="orb"></div>
-  <div class="orb"></div>
-  <div class="orb"></div>
+<!-- Background Layer -->
+<div class="bg-layer">
+  <div class="bg-ambient default-active active"></div>
+  <div class="bg-ambient" data-domain="watch"></div>
+  <div class="bg-ambient" data-domain="kitchen"></div>
+  <div class="bg-ambient" data-domain="masks"></div>
+  <div class="bg-ambient" data-domain="brain"></div>
+  <div class="bg-ambient" data-domain="read"></div>
+  <div class="bg-ambient" data-domain="world"></div>
+  <div class="particles">
+    <div class="particle visible"></div>
+    <div class="particle visible"></div>
+    <div class="particle visible"></div>
+    <div class="particle visible"></div>
+    <div class="particle visible"></div>
+    <div class="particle visible"></div>
+  </div>
 </div>
 
-<div class="container">
-  <header class="header">
-    <h1 class="domain">kaleb.one</h1>
-    <p class="tagline">A personal constellation of tools, wikis, and kitchens.</p>
-  </header>
+<!-- Launcher -->
+<div class="launcher">
 
-  <div class="app-grid">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">k</div>
+    <div class="sidebar-divider"></div>
 
-    <a href="https://watch.kaleb.one" class="app-card" target="_self">
-      <div class="app-icon" style="background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.05));">🎬</div>
-      <div class="app-card-body">
-        <div class="app-name">Watch</div>
-        <div class="app-desc">Movies &amp; TV backlog with poster art, priority queues, streaming availability, and DTDD safety ratings.</div>
-        <div><span class="status-badge status-live"><span class="status-dot"></span>Live</span></div>
+    <div class="sidebar-icon" data-domain="watch" data-accent="#fbbf24" data-accent-dim="rgba(251,191,36,0.15)" data-accent-glow="rgba(251,191,36,0.08)" data-href="https://watch.kaleb.one">
+      🎬
+      <span class="tooltip">Watch</span>
+      <span class="status-pip live"></span>
+    </div>
+    <div class="sidebar-icon" data-domain="kitchen" data-accent="#fb923c" data-accent-dim="rgba(251,146,60,0.15)" data-accent-glow="rgba(251,146,60,0.08)" data-href="https://kitchen.kaleb.one">
+      👨‍🍳
+      <span class="tooltip">Kitchen</span>
+      <span class="status-pip live"></span>
+    </div>
+    <div class="sidebar-icon" data-domain="masks" data-accent="#a78bfa" data-accent-dim="rgba(167,139,250,0.15)" data-accent-glow="rgba(167,139,250,0.08)" data-href="https://masks.kaleb.one">
+      🎭
+      <span class="tooltip">Masks Wiki</span>
+      <span class="status-pip live"></span>
+    </div>
+    <div class="sidebar-icon" data-domain="brain" data-accent="#60a5fa" data-accent-dim="rgba(96,165,250,0.15)" data-accent-glow="rgba(96,165,250,0.08)" data-href="https://brain.kaleb.one">
+      🧠
+      <span class="tooltip">Brain</span>
+      <span class="status-pip live"></span>
+    </div>
+    <div class="sidebar-icon" data-domain="read" data-accent="#34d399" data-accent-dim="rgba(52,211,153,0.15)" data-accent-glow="rgba(52,211,153,0.08)" data-href="https://read.kaleb.one">
+      📖
+      <span class="tooltip">Read</span>
+      <span class="status-pip live"></span>
+    </div>
+    <div class="sidebar-icon" data-domain="world" data-accent="#f472b6" data-accent-dim="rgba(244,114,182,0.15)" data-accent-glow="rgba(244,114,182,0.08)" data-href="#">
+      🌍
+      <span class="tooltip">World</span>
+      <span class="status-pip soon"></span>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <div class="top-bar-title" id="topBarTitle">kaleb.one</div>
+        <div class="top-bar-badge" id="topBarBadge" style="display:none;"></div>
       </div>
-      <div class="app-url">watch.kaleb.one</div>
-    </a>
-
-    <a href="https://kitchen.kaleb.one" class="app-card" target="_self">
-      <div class="app-icon" style="background: linear-gradient(135deg, rgba(251,146,60,0.2), rgba(251,146,60,0.05));">🍳</div>
-      <div class="app-card-body">
-        <div class="app-name">Kitchen</div>
-        <div class="app-desc">Recipes, meal plans, and grocery lists. Home cooking with gout-friendly &amp; liver-friendly ratings.</div>
-        <div><span class="status-badge status-live"><span class="status-dot"></span>Live</span></div>
+      <div class="top-bar-right">
+        <div class="clock" id="clock"></div>
+        <div class="user-avatar">k</div>
       </div>
-      <div class="app-url">kitchen.kaleb.one</div>
-    </a>
+    </div>
 
-    <a href="https://masks.kaleb.one" class="app-card" target="_self">
-      <div class="app-icon" style="background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(167,139,250,0.05));">🎭</div>
-      <div class="app-card-body">
-        <div class="app-name">Masks Wiki</div>
-        <div class="app-desc">The Halden City encyclopedia. Lore, factions, characters, and worldbuilding for the masked city.</div>
-        <div><span class="status-badge status-live"><span class="status-dot"></span>Live</span></div>
-      </div>
-      <div class="app-url">masks.kaleb.one</div>
-    </a>
+    <!-- Default View (nothing selected) -->
+    <div class="default-view" id="defaultView">
+      <h1 class="default-title">kaleb.one</h1>
+      <p class="default-subtitle">A personal constellation of tools, wikis, and kitchens.</p>
+      <p class="default-hint"><span class="arrow-left">←</span> Select a domain to explore</p>
+    </div>
 
-    <a href="https://brain.kaleb.one" class="app-card" target="_self">
-      <div class="app-icon" style="background: linear-gradient(135deg, rgba(96,165,250,0.2), rgba(96,165,250,0.05));">🧠</div>
-      <div class="app-card-body">
-        <div class="app-name">Brain</div>
-        <div class="app-desc">Second brain vault. Notes, ideas, and knowledge graphs — the backbone behind everything.</div>
-        <div><span class="status-badge status-live"><span class="status-dot"></span>Live</span></div>
+    <!-- Domain View (appears on selection) -->
+    <div class="domain-view" id="domainView">
+      <!-- Hero -->
+      <div class="domain-hero">
+        <div class="domain-hero-bg" id="heroBg"></div>
+        <div class="domain-hero-content">
+          <h2 class="domain-hero-name" id="heroName"></h2>
+          <p class="domain-hero-desc" id="heroDesc"></p>
+          <a class="launch-btn" id="launchBtn" href="#">
+            <span>LAUNCH</span>
+            <span class="launch-arrow">→</span>
+          </a>
+        </div>
       </div>
-      <div class="app-url">brain.kaleb.one</div>
-    </a>
 
-    <a href="https://read.kaleb.one" class="app-card" target="_self">
-      <div class="app-icon" style="background: linear-gradient(135deg, rgba(96,165,250,0.2), rgba(167,139,250,0.05));">📖</div>
-      <div class="app-card-body">
-        <div class="app-name">Read</div>
-        <div class="app-desc">Reading list &amp; book shelf. Track what you're reading, margin notes, and literary discoveries.</div>
-        <div><span class="status-badge status-live"><span class="status-dot"></span>Live</span></div>
-      </div>
-      <div class="app-url">read.kaleb.one</div>
-    </a>
+      <!-- Preview Panel -->
+      <div class="preview-panel">
+        <!-- Stats -->
+        <div class="stats-row" id="statsRow">
+          <div class="stat-item">
+            <div class="stat-value" id="stat1Val">—</div>
+            <div class="stat-label" id="stat1Label">—</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="stat2Val">—</div>
+            <div class="stat-label" id="stat2Label">—</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="stat3Val">—</div>
+            <div class="stat-label" id="stat3Label">—</div>
+          </div>
+        </div>
 
-    <a href="#" class="app-card" style="opacity: 0.5; cursor: default;" onclick="return false">
-      <div class="app-icon" style="background: linear-gradient(135deg, rgba(244,114,182,0.2), rgba(244,114,182,0.05));">🌍</div>
-      <div class="app-card-body">
-        <div class="app-name">World</div>
-        <div class="app-desc">Worldbuilding hub. Maps, timelines, and interconnected narratives.</div>
-        <div><span class="status-badge status-soon"><span class="status-dot"></span>Coming Soon</span></div>
+        <!-- Recent Activity -->
+        <div class="preview-card">
+          <div class="preview-card-header">
+            <span class="preview-card-title" id="recentTitle">Recent</span>
+            <span class="preview-card-count" id="recentCount">0</span>
+          </div>
+          <div id="recentList"></div>
+          <div class="activity-bars" id="activityBars"></div>
+        </div>
+
+        <!-- Quick Info -->
+        <div class="preview-card" id="infoCard">
+          <div class="preview-card-header">
+            <span class="preview-card-title" id="infoTitle">Quick Info</span>
+          </div>
+          <div id="infoList"></div>
+        </div>
       </div>
-      <div class="app-url">world.kaleb.one</div>
-    </a>
+    </div>
 
   </div>
-
-  <footer class="footer">
-    <p>Handcrafted with care · Cloudflare Pages · Liquid Glass</p>
-  </footer>
 </div>
+
+<script>
+  // Domain data
+  const domains = {
+    watch: {
+      name: 'Watch',
+      desc: 'Movies & TV backlog with poster art, priority queues, streaming availability, and DTDD safety ratings.',
+      href: 'https://watch.kaleb.one',
+      status: 'live',
+      stats: [
+        { value: '42', label: 'Watchlist' },
+        { value: '8', label: 'In Progress' },
+        { value: '127', label: 'Watched' }
+      ],
+      recent: {
+        title: 'Recently Added',
+        count: 5,
+        items: [
+          { icon: '🎞️', text: 'Severance S02', meta: 'Apple TV+' },
+          { icon: '🎬', text: 'The Brutalist', meta: '2024' },
+          { icon: '📺', text: 'The Bear S03', meta: 'Hulu' },
+          { icon: '🎞️', text: 'Shōgun', meta: 'FX' },
+          { icon: '🎬', text: 'Anora', meta: '2024' }
+        ]
+      },
+      info: {
+        title: 'Quick Info',
+        items: [
+          { icon: '🔐', text: 'Access protected' },
+          { icon: '📊', text: 'Priority-queued backlog' },
+          { icon: '⚠️', text: 'DTDD safety ratings' }
+        ]
+      },
+      bars: [60, 75, 40, 90, 55, 80, 45, 95, 70, 35],
+      heroGradient: 'linear-gradient(135deg, rgba(251,191,36,0.15) 0%, rgba(251,146,60,0.08) 50%, rgba(234,88,12,0.04) 100%)'
+    },
+    kitchen: {
+      name: 'Kitchen',
+      desc: 'Recipes, meal plans, and grocery lists. Home cooking with gout-friendly & liver-friendly ratings.',
+      href: 'https://kitchen.kaleb.one',
+      status: 'live',
+      stats: [
+        { value: '86', label: 'Recipes' },
+        { value: '12', label: 'Meal Plans' },
+        { value: '4', label: 'Weeks Planned' }
+      ],
+      recent: {
+        title: 'Recent Recipes',
+        count: 3,
+        items: [
+          { icon: '🍲', text: 'Lemon Herb Salmon', meta: 'Gout ★★★★☆' },
+          { icon: '🥗', text: 'Quinoa Power Bowl', meta: 'Liver ★★★★★' },
+          { icon: '🍝', text: 'Turkey Bolognese', meta: 'Gout ★★★☆☆' }
+        ]
+      },
+      info: {
+        title: 'Features',
+        items: [
+          { icon: '🛒', text: 'Interactive grocery lists' },
+          { icon: '💊', text: 'Gout & liver ratings' },
+          { icon: '📅', text: 'Weekly meal planning' }
+        ]
+      },
+      bars: [50, 65, 80, 45, 70, 90, 55, 75, 60, 40],
+      heroGradient: 'linear-gradient(135deg, rgba(251,146,60,0.18) 0%, rgba(234,88,12,0.08) 50%, rgba(220,38,38,0.04) 100%)'
+    },
+    masks: {
+      name: 'Masks Wiki',
+      desc: 'The Halden City encyclopedia. Lore, factions, characters, and worldbuilding for the masked city.',
+      href: 'https://masks.kaleb.one',
+      status: 'live',
+      stats: [
+        { value: '94', label: 'Articles' },
+        { value: '6', label: 'Factions' },
+        { value: '23', label: 'Characters' }
+      ],
+      recent: {
+        title: 'Recent Edits',
+        count: 4,
+        items: [
+          { icon: '⚔️', text: 'The Veiled Court', meta: 'Faction' },
+          { icon: '👤', text: 'Warden Ashwick', meta: 'Character' },
+          { icon: '🏛️', text: 'The Undercity', meta: 'Location' },
+          { icon: '📜', text: 'Charter of Masks', meta: 'Lore' }
+        ]
+      },
+      info: {
+        title: 'About',
+        items: [
+          { icon: '🔒', text: 'Access protected' },
+          { icon: '🗺️', text: 'Cross-referenced lore' },
+          { icon: '✍️', text: 'Living worldbuilding' }
+        ]
+      },
+      bars: [40, 55, 70, 85, 60, 50, 75, 45, 90, 65],
+      heroGradient: 'linear-gradient(135deg, rgba(167,139,250,0.18) 0%, rgba(139,92,246,0.08) 50%, rgba(109,40,217,0.04) 100%)'
+    },
+    brain: {
+      name: 'Brain',
+      desc: 'Second brain vault. Notes, ideas, and knowledge graphs — the backbone behind everything.',
+      href: 'https://brain.kaleb.one',
+      status: 'live',
+      stats: [
+        { value: '1.2K', label: 'Notes' },
+        { value: '8', label: 'Domains' },
+        { value: '∞', label: 'Connections' }
+      ],
+      recent: {
+        title: 'Recent Notes',
+        count: 4,
+        items: [
+          { icon: '📝', text: 'MCP Server Architecture', meta: 'mesh' },
+          { icon: '🔗', text: 'Sovereign Mesh Pipeline', meta: 'workflow' },
+          { icon: '🏗️', text: 'Domain App Pattern', meta: 'dev' },
+          { icon: '💡', text: 'Liquid Glass Design Sys', meta: 'design' }
+        ]
+      },
+      info: {
+        title: 'About',
+        items: [
+          { icon: '🔒', text: 'Access protected' },
+          { icon: '🕸️', text: 'Knowledge graph' },
+          { icon: '🧩', text: 'Obsidian vault' }
+        ]
+      },
+      bars: [70, 85, 45, 60, 90, 55, 75, 80, 50, 95],
+      heroGradient: 'linear-gradient(135deg, rgba(96,165,250,0.18) 0%, rgba(59,130,246,0.08) 50%, rgba(37,99,235,0.04) 100%)'
+    },
+    read: {
+      name: 'Read',
+      desc: "Reading list & book shelf. Track what you're reading, margin notes, and literary discoveries.",
+      href: 'https://read.kaleb.one',
+      status: 'live',
+      stats: [
+        { value: '34', label: 'Books' },
+        { value: '3', label: 'Reading' },
+        { value: '21', label: 'Finished' }
+      ],
+      recent: {
+        title: 'On the Shelf',
+        count: 4,
+        items: [
+          { icon: '📘', text: 'Project Hail Mary', meta: ' ★★★★★' },
+          { icon: '📗', text: 'Children of Time', meta: ' ★★★★☆' },
+          { icon: '📕', text: 'The Dawn of Everything', meta: 'Reading' },
+          { icon: '📙', text: 'Meditations', meta: ' ★★★★★' }
+        ]
+      },
+      info: {
+        title: 'Features',
+        items: [
+          { icon: '⭐', text: 'Star ratings & reviews' },
+          { icon: '📚', text: 'Google Books metadata' },
+          { icon: '🔒', text: 'Access protected' }
+        ]
+      },
+      bars: [55, 70, 85, 40, 60, 75, 50, 90, 65, 45],
+      heroGradient: 'linear-gradient(135deg, rgba(52,211,153,0.16) 0%, rgba(16,185,129,0.08) 50%, rgba(5,150,105,0.04) 100%)'
+    },
+    world: {
+      name: 'World',
+      desc: 'Worldbuilding hub. Maps, timelines, and interconnected narratives.',
+      href: '#',
+      status: 'soon',
+      stats: [
+        { value: '—', label: 'Maps' },
+        { value: '—', label: 'Timelines' },
+        { value: '—', label: 'Stories' }
+      ],
+      recent: {
+        title: 'Coming Soon',
+        count: 0,
+        items: [
+          { icon: '🗺️', text: 'Interactive world maps', meta: '' },
+          { icon: '⏳', text: 'Visual timelines', meta: '' },
+          { icon: '📖', text: 'Interconnected stories', meta: '' }
+        ]
+      },
+      info: {
+        title: 'Planned',
+        items: [
+          { icon: '🚧', text: 'Under construction' },
+          { icon: '🎨', text: 'Custom map renderer' },
+          { icon: '🔗', text: 'Cross-domain links' }
+        ]
+      },
+      bars: [20, 30, 15, 25, 35, 10, 40, 20, 30, 15],
+      heroGradient: 'linear-gradient(135deg, rgba(244,114,182,0.14) 0%, rgba(236,72,153,0.06) 50%, rgba(190,24,93,0.03) 100%)'
+    }
+  };
+
+  // State
+  let activeDomain = null;
+
+  // DOM refs
+  const defaultView = document.getElementById('defaultView');
+  const domainView = document.getElementById('domainView');
+  const topBarTitle = document.getElementById('topBarTitle');
+  const topBarBadge = document.getElementById('topBarBadge');
+  const heroName = document.getElementById('heroName');
+  const heroDesc = document.getElementById('heroDesc');
+  const heroBg = document.getElementById('heroBg');
+  const launchBtn = document.getElementById('launchBtn');
+  const sidebarIcons = document.querySelectorAll('.sidebar-icon[data-domain]');
+  const bgAmbients = document.querySelectorAll('.bg-ambient');
+  const particles = document.querySelectorAll('.particle');
+
+  // Select domain
+  function selectDomain(key) {
+    const data = domains[key];
+    if (!data) return;
+
+    // Deactivate previous
+    sidebarIcons.forEach(el => el.classList.remove('active'));
+    bgAmbients.forEach(el => el.classList.remove('active'));
+
+    // Activate new
+    const icon = document.querySelector(`.sidebar-icon[data-domain="${key}"]`);
+    if (icon) icon.classList.add('active');
+    const ambient = document.querySelector(`.bg-ambient[data-domain="${key}"]`);
+    if (ambient) ambient.classList.add('active');
+
+    // Set accent
+    document.documentElement.style.setProperty('--accent', data.stats ? (icon?.dataset.accent || '#a78bfa') : '#a78bfa');
+    document.documentElement.style.setProperty('--accent-dim', icon?.dataset.accentDim || 'rgba(167,139,250,0.15)');
+    document.documentElement.style.setProperty('--accent-glow', icon?.dataset.accentGlow || 'rgba(167,139,250,0.06)');
+
+    // Particles color
+    particles.forEach(p => p.style.background = icon?.dataset.accent || '#a78bfa');
+
+    // Top bar
+    topBarTitle.textContent = data.name;
+    topBarBadge.style.display = 'inline-flex';
+    topBarBadge.textContent = data.status === 'live' ? 'LIVE' : 'COMING SOON';
+    topBarBadge.style.background = data.status === 'live' ? 'rgba(52,211,153,0.15)' : 'rgba(251,191,36,0.15)';
+    topBarBadge.style.color = data.status === 'live' ? '#34d399' : '#fbbf24';
+
+    // Hero
+    heroName.textContent = data.name;
+    heroName.style.color = icon?.dataset.accent || '#fff';
+    heroDesc.textContent = data.desc;
+    heroBg.style.background = data.heroGradient;
+
+    // Launch button
+    launchBtn.setAttribute('href', data.href);
+    launchBtn.className = 'launch-btn' + (data.status === 'soon' ? ' coming-soon' : '');
+    if (data.status === 'soon') {
+      launchBtn.onclick = (e) => e.preventDefault();
+      launchBtn.querySelector('span:first-child').textContent = 'COMING SOON';
+    } else {
+      launchBtn.onclick = null;
+      launchBtn.querySelector('span:first-child').textContent = 'LAUNCH';
+    }
+
+    // Stats
+    document.getElementById('stat1Val').textContent = data.stats[0].value;
+    document.getElementById('stat1Label').textContent = data.stats[0].label;
+    document.getElementById('stat2Val').textContent = data.stats[1].value;
+    document.getElementById('stat2Label').textContent = data.stats[1].label;
+    document.getElementById('stat3Val').textContent = data.stats[2].value;
+    document.getElementById('stat3Label').textContent = data.stats[2].label;
+
+    // Color the stat values with accent
+    document.querySelectorAll('.stat-value').forEach(el => el.style.color = icon?.dataset.accent || '#fff');
+
+    // Recent items
+    document.getElementById('recentTitle').textContent = data.recent.title;
+    document.getElementById('recentCount').textContent = data.recent.count;
+    document.getElementById('recentCount').style.background = icon?.dataset.accentDim || 'rgba(167,139,250,0.15)';
+    document.getElementById('recentCount').style.color = icon?.dataset.accent || '#a78bfa';
+
+    const recentList = document.getElementById('recentList');
+    recentList.innerHTML = '';
+    data.recent.items.forEach(item => {
+      recentList.innerHTML += `<div class="preview-item"><span class="preview-item-icon">${item.icon}</span><span class="preview-item-text">${item.text}</span><span class="preview-item-meta">${item.meta}</span></div>`;
+    });
+
+    // Activity bars
+    const barsContainer = document.getElementById('activityBars');
+    barsContainer.innerHTML = '';
+    data.bars.forEach((h, i) => {
+      barsContainer.innerHTML += `<div class="activity-bar" style="height: ${h}%; background: ${icon?.dataset.accent || '#a78bfa'}; opacity: ${0.3 + (h/100) * 0.7}; animation-delay: ${i * 50}ms;"></div>`;
+    });
+
+    // Info card
+    document.getElementById('infoTitle').textContent = data.info.title;
+    const infoList = document.getElementById('infoList');
+    infoList.innerHTML = '';
+    data.info.items.forEach(item => {
+      infoList.innerHTML += `<div class="preview-item"><span class="preview-item-icon">${item.icon}</span><span class="preview-item-text">${item.text}</span></div>`;
+    });
+
+    // Toggle views
+    defaultView.classList.add('hidden');
+    domainView.classList.add('visible');
+
+    activeDomain = key;
+  }
+
+  // Deselect (click active icon again or logo)
+  function deselectDomain() {
+    sidebarIcons.forEach(el => el.classList.remove('active'));
+    bgAmbients.forEach(el => el.classList.remove('active'));
+    document.querySelector('.bg-ambient.default-active').classList.add('active');
+
+    // Reset accent
+    document.documentElement.style.setProperty('--accent', '#a78bfa');
+    document.documentElement.style.setProperty('--accent-dim', 'rgba(167,139,250,0.15)');
+    document.documentElement.style.setProperty('--accent-glow', 'rgba(167,139,250,0.06)');
+    particles.forEach(p => p.style.background = '#a78bfa');
+
+    topBarTitle.textContent = 'kaleb.one';
+    topBarBadge.style.display = 'none';
+
+    defaultView.classList.remove('hidden');
+    domainView.classList.remove('visible');
+
+    activeDomain = null;
+  }
+
+  // Event listeners
+  sidebarIcons.forEach(icon => {
+    icon.addEventListener('click', () => {
+      const key = icon.dataset.domain;
+      if (activeDomain === key) {
+        deselectDomain();
+      } else {
+        selectDomain(key);
+      }
+    });
+
+    // Hover preview (lightweight - just change accent color hint)
+    icon.addEventListener('mouseenter', () => {
+      if (activeDomain) return; // don't override if something is selected
+      const accent = icon.dataset.accent;
+      document.documentElement.style.setProperty('--accent', accent);
+      document.documentElement.style.setProperty('--accent-dim', icon.dataset.accentDim);
+      document.documentElement.style.setProperty('--accent-glow', icon.dataset.accentGlow);
+      particles.forEach(p => p.style.background = accent);
+
+      const ambient = document.querySelector(`.bg-ambient[data-domain="${icon.dataset.domain}"]`);
+      if (ambient) ambient.style.opacity = '0.5';
+    });
+
+    icon.addEventListener('mouseleave', () => {
+      if (activeDomain) return;
+      document.documentElement.style.setProperty('--accent', '#a78bfa');
+      document.documentElement.style.setProperty('--accent-dim', 'rgba(167,139,250,0.15)');
+      document.documentElement.style.setProperty('--accent-glow', 'rgba(167,139,250,0.06)');
+      particles.forEach(p => p.style.background = '#a78bfa');
+
+      const ambient = document.querySelector(`.bg-ambient[data-domain="${icon.dataset.domain}"]`);
+      if (ambient) ambient.style.opacity = '0';
+    });
+  });
+
+  document.querySelector('.sidebar-logo').addEventListener('click', deselectDomain);
+
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    const h = now.getHours().toString().padStart(2, '0');
+    const m = now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('clock').textContent = `${h}:${m}`;
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const keys = ['watch', 'kitchen', 'masks', 'brain', 'read', 'world'];
+    const num = parseInt(e.key);
+    if (num >= 1 && num <= keys.length) {
+      selectDomain(keys[num - 1]);
+    }
+    if (e.key === 'Escape') {
+      deselectDomain();
+    }
+    if (e.key === 'Enter' && activeDomain && domains[activeDomain]?.status === 'live') {
+      window.location.href = domains[activeDomain].href;
+    }
+  });
+</script>
 
 </body>
 </html>
