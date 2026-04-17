@@ -976,7 +976,7 @@
     <div class="default-view" id="defaultView">
       <h1 class="default-title">kaleb.one</h1>
       <p class="default-subtitle">A personal constellation of tools, wikis, and kitchens.</p>
-      <p class="default-hint"><span class="arrow-left">←</span> Select a domain to explore</p>
+      <p class="default-hint"><span class="arrow-left">←</span> Select a domain to explore · Press <kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; border: 1px solid rgba(255,255,255,0.1);">1</kbd>-<kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; border: 1px solid rgba(255,255,255,0.1);">6</kbd> · <kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; border: 1px solid rgba(255,255,255,0.1);">n</kbd> to quick-add</p>
     </div>
 
     <!-- Domain View (appears on selection) -->
@@ -991,6 +991,9 @@
             <span>LAUNCH</span>
             <span class="launch-arrow">→</span>
           </a>
+          <button class="launch-btn" id="quickAddBtn" style="margin-left: 10px; border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5); font-size: 0.75rem; padding: 10px 18px;">
+            <span>⚡ QUICK ADD</span>
+          </button>
         </div>
       </div>
 
@@ -1359,6 +1362,7 @@
     domainView.classList.add('visible');
 
     activeDomain = key;
+    updateQuickAddButton();
   }
 
   // Deselect (click active icon again or logo)
@@ -1706,6 +1710,25 @@
     }
   });
 
+  // Quick Add button in hero panel
+  const quickAddBtn = document.getElementById('quickAddBtn');
+
+  function updateQuickAddButton() {
+    if (!quickAddBtn) return;
+    const domain = activeDomain;
+    if (domain && quickAddFields[domain]) {
+      quickAddBtn.style.display = 'inline-flex';
+    } else {
+      quickAddBtn.style.display = 'none';
+    }
+  }
+
+  quickAddBtn?.addEventListener('click', () => {
+    if (activeDomain && quickAddFields[activeDomain]) {
+      openQuickAdd(activeDomain);
+    }
+  });
+
   // ─── Keyboard navigation ───
 
   document.addEventListener('keydown', (e) => {
@@ -1724,6 +1747,16 @@
 
     if (num >= 1 && num <= keys.length) {
       selectDomain(keys[num - 1]);
+    }
+
+    // 'n' key opens quick-add for active domain
+    if (e.key === 'n' && !e.ctrlKey && !e.metaKey && activeDomain && quickAddFields[activeDomain] && !quickAddModal.classList.contains('visible')) {
+      const active = document.activeElement;
+      if (!active || (active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA' && active.tagName !== 'SELECT')) {
+        e.preventDefault();
+        openQuickAdd(activeDomain);
+        return;
+      }
     }
 
     // Submit modal on Enter (if input is focused)
