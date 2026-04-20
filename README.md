@@ -21,8 +21,8 @@ Public app launcher — a Liquid Glass hub for the `*.kaleb.one` constellation.
 ## Deploy
 
 ```bash
-CF_TOKEN=$(op read "op://Developer/Global Cloudflare Token/credential")
+CF_TOKEN=*** read "op://Developer/Global Cloudflare Token/credential")
 CF_ACCOUNT_ID="e500dc74dca67189444bf0af0b54c39d"
-CLOUDFLARE_API_TOKEN="$CF_TOKEN" CLOUDFLARE_ACCOUNT_ID="$CF_ACCOUNT_ID" \
-  npx wrangler pages deploy . --project-name=kaleb-one --branch=main
+CLOUDFLARE_API_TOKEN="***" CLOUDFLARE_ACCOUNT_ID="$CF_ACCOUNT_ID" \
+  npx wrangler pages deploy . --project-name=hub-kaleb-one --branch=main
 ```
