@@ -3,10 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>kaleb.one</title>
+  <meta name="description" content="kaleb.one — A personal constellation of tools, wikis, and kitchens.">
+  <meta property="og:title" content="kaleb.one">
+  <meta property="og:description" content="A personal constellation of tools, wikis, and kitchens.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://kaleb.one/">
+  <meta name="theme-color" content="#08060e">
+  <title>kaleb.one</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Georgia&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2308060e'/><rect x='1' y='1' width='30' height='30' rx='7' fill='none' stroke='rgba(167,139,250,0.3)' stroke-width='1'/><text x='16' y='22' font-family='Georgia,serif' font-size='18' fill='white' text-anchor='middle' font-weight='400'>k</text></svg>" type="image/svg+xml">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -44,6 +51,8 @@
     height: 100vh;
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
   /* ─── Background Layer ─── */
@@ -78,12 +87,14 @@
   .bg-ambient[data-domain="world"]  { background: radial-gradient(ellipse at 30% 30%, rgba(244,114,182,0.12) 0%, transparent 55%),
                                                  radial-gradient(ellipse at 70% 70%, rgba(236,72,153,0.06) 0%, transparent 55%); }
   .bg-ambient[data-domain="music"]  { background: radial-gradient(ellipse at 40% 20%, rgba(236,72,153,0.15) 0%, transparent 55%),
+                                                 radial-gradient(ellipse at 60% 80%, rgba(168,85,247,0.08) 0%, transparent 55%); }
   .bg-ambient[data-domain="projects"] { background: radial-gradient(ellipse at 25% 35%, rgba(16,185,129,0.14) 0%, transparent 55%),
                                                  radial-gradient(ellipse at 75% 65%, rgba(59,130,246,0.08) 0%, transparent 55%); }
-                                                 radial-gradient(ellipse at 60% 80%, rgba(168,85,247,0.08) 0%, transparent 55%); }
   .bg-ambient[data-domain="flow"] { background: radial-gradient(ellipse at 25% 35%, rgba(6,182,212,0.14) 0%, transparent 55%),
-                                                radial-gradient(ellipse at 75% 65%, rgba(59,130,246,0.08) 0%, transparent 55%),
-                                                radial-gradient(ellipse at 60% 80%, rgba(139,92,246,0.06) 0%, transparent 55%); }
+                                               radial-gradient(ellipse at 75% 65%, rgba(59,130,246,0.08) 0%, transparent 55%),
+                                               radial-gradient(ellipse at 60% 80%, rgba(139,92,246,0.06) 0%, transparent 55%); }
+  .bg-ambient[data-domain="watchtower"] { background: radial-gradient(ellipse at 20% 25%, rgba(34,211,238,0.14) 0%, transparent 55%),
+                                               radial-gradient(ellipse at 70% 65%, rgba(6,182,212,0.08) 0%, transparent 55%); }
   .bg-ambient[data-domain="craft"] { background: radial-gradient(ellipse at 25% 35%, rgba(245,158,11,0.14) 0%, transparent 55%),
                                                  radial-gradient(ellipse at 75% 65%, rgba(217,119,6,0.08) 0%, transparent 55%),
                                                  radial-gradient(ellipse at 60% 80%, rgba(234,88,12,0.06) 0%, transparent 55%); }
@@ -211,32 +222,49 @@
     box-shadow: 0 0 20px var(--accent-glow);
   }
 
+  .sidebar-icon:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .launch-btn:focus-visible,
+  .modal-btn:focus-visible,
+  .modal-close:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
   .sidebar-icon.active::after {
     transform: translateY(-50%) scaleY(1);
   }
 
-  /* Tooltip */
-  .sidebar-icon .tooltip {
-    position: absolute;
-    left: calc(100% + 14px);
-    top: 50%;
-    transform: translateY(-50%) translateX(-6px);
-    background: rgba(13, 11, 20, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(12px);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: all var(--transition-fast);
-    z-index: 100;
+  /* Tooltip — hover-only for pointer devices */
+  @media (hover: hover) {
+    .sidebar-icon .tooltip {
+      position: absolute;
+      left: calc(100% + 14px);
+      top: 50%;
+      transform: translateY(-50%) translateX(-6px);
+      background: rgba(13, 11, 20, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all var(--transition-fast);
+      z-index: 100;
+    }
+    .sidebar-icon:hover .tooltip {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
   }
-  .sidebar-icon:hover .tooltip {
-    opacity: 1;
-    transform: translateY(-50%) translateX(0);
+  @media (hover: none) {
+    .sidebar-icon .tooltip { display: none; }
   }
 
   .sidebar-spacer { flex: 1; }
@@ -656,6 +684,17 @@
     .stats-row { grid-template-columns: 1fr 1fr; }
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .particle { display: none; }
+    .bg-ambient { transition: none; }
+    .default-hint .arrow-left { animation: none; }
+  }
+
   /* ─── Scrollbar ─── */
   .preview-panel { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
   .preview-panel::-webkit-scrollbar { width: 4px; }
@@ -1055,6 +1094,7 @@
   <div class="bg-ambient" data-domain="music"></div>
   <div class="bg-ambient" data-domain="projects"></div>
   <div class="bg-ambient" data-domain="flow"></div>
+  <div class="bg-ambient" data-domain="watchtower"></div>
   <div class="bg-ambient" data-domain="craft"></div>
   <div class="particles">
     <div class="particle visible"></div>
@@ -1102,7 +1142,7 @@
       <span class="status-pip live"></span>
       <span class="quick-add-pip">+</span>
     </div>
-    <div class="sidebar-icon" data-domain="world" data-accent="#f472b6" data-accent-dim="rgba(244,114,182,0.15)" data-accent-glow="rgba(244,114,182,0.08)" data-href="#">
+    <div class="sidebar-icon" data-domain="world" data-accent="#f472b6" data-accent-dim="rgba(244,114,182,0.15)" data-accent-glow="rgba(244,114,182,0.08)" data-href="javascript:void(0)">
       🌍
       <span class="tooltip">World</span>
       <span class="status-pip soon"></span>
@@ -1121,6 +1161,11 @@
     <div class="sidebar-icon" data-domain="flow" data-accent="#06b6d4" data-accent-dim="rgba(6,182,212,0.15)" data-accent-glow="rgba(6,182,212,0.08)" data-href="https://flow.kaleb.one">
       🌊
       <span class="tooltip">Flow</span>
+      <span class="status-pip live"></span>
+    </div>
+    <div class="sidebar-icon" data-domain="watchtower" data-accent="#22d3ee" data-accent-dim="rgba(34,211,238,0.15)" data-accent-glow="rgba(34,211,238,0.08)" data-href="https://watchtower.kaleb.one">
+      📊
+      <span class="tooltip">Watchtower</span>
       <span class="status-pip live"></span>
     </div>
     <div class="sidebar-icon" data-domain="craft" data-accent="#f59e0b" data-accent-dim="rgba(245,158,11,0.15)" data-accent-glow="rgba(245,158,11,0.08)" data-href="https://craft.kaleb.one">
@@ -1401,7 +1446,7 @@
     world: {
       name: 'World',
       desc: 'Worldbuilding hub. Maps, timelines, and interconnected narratives.',
-      href: '#',
+      href: 'javascript:void(0)',
       status: 'soon',
       stats: [
         { value: '—', label: 'Maps' },
@@ -1492,38 +1537,6 @@
       bars: [80, 65, 90, 75, 55, 85, 70, 95, 60, 80],
       heroGradient: 'linear-gradient(135deg, rgba(236,72,153,0.18) 0%, rgba(168,85,247,0.10) 50%, rgba(244,114,182,0.04) 100%)'
     },
-    projects: {
-      name: 'Projects',
-      desc: 'Project management with Gantt timelines, Kanban boards, milestones, and task tracking.',
-      href: 'https://projects.kaleb.one',
-      status: 'live',
-      stats: [
-        { value: '1', label: 'Active' },
-        { value: '5', label: 'Milestones' },
-        { value: '0%', label: 'Complete' }
-      ],
-      recent: {
-        title: 'Active Projects',
-        count: 1,
-        items: [
-          { icon: '🖥️', text: 'Gaming Streaming Rig', meta: 'Active' },
-          { icon: '⚙️', text: 'Hardware Setup', meta: 'Setup' },
-          { icon: '🌐', text: 'Network Bridge', meta: 'Networking' },
-          { icon: '🎮', text: 'Game Testing', meta: 'Testing' },
-          { icon: '✅', text: 'Optimization', meta: 'Final' }
-        ]
-      },
-      info: {
-        title: 'Features',
-        items: [
-          { icon: '📊', text: 'Gantt chart timelines' },
-          { icon: '📋', text: 'Kanban board view' },
-          { icon: '🔒', text: 'Access protected' }
-        ]
-      },
-      bars: [30, 60, 45, 75, 55, 40, 80, 50, 65, 70],
-      heroGradient: 'linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(59,130,246,0.10) 50%, rgba(139,92,246,0.04) 100%)'
-    },
     flow: {
       name: 'Flow',
       desc: 'Morning dashboard — health snapshot, active projects, household context, and quick links to your entire ecosystem.',
@@ -1555,6 +1568,36 @@
       },
       bars: [90, 75, 60, 85, 70, 55, 80, 65, 95, 50],
       heroGradient: 'linear-gradient(135deg, rgba(6,182,212,0.18) 0%, rgba(59,130,246,0.10) 50%, rgba(139,92,246,0.04) 100%)'
+    },
+    watchtower: {
+      name: 'Watchtower',
+      desc: 'Hermes usage dashboard — real-time metrics, token spend, model usage, and session tracking across the Sovereign Mesh.',
+      href: 'https://watchtower.kaleb.one',
+      status: 'live',
+      stats: [
+        { value: '∞', label: 'Sessions' },
+        { value: '10+', label: 'Models' },
+        { value: '24/7', label: 'Uptime' }
+      ],
+      recent: {
+        title: 'Active Agents',
+        count: 3,
+        items: [
+          { icon: '🤖', text: 'The Director', meta: 'Primary' },
+          { icon: '📡', text: 'Mesh Relay', meta: 'Active' },
+          { icon: '🔮', text: 'Session Monitor', meta: 'Live' }
+        ]
+      },
+      info: {
+        title: 'About',
+        items: [
+          { icon: '📊', text: 'Token usage analytics' },
+          { icon: '🔐', text: 'Access protected' },
+          { icon: '⚡', text: 'Real-time streaming' }
+        ]
+      },
+      bars: [85, 70, 90, 60, 95, 75, 80, 55, 90, 65],
+      heroGradient: 'linear-gradient(135deg, rgba(34,211,238,0.18) 0%, rgba(6,182,212,0.10) 50%, rgba(8,145,178,0.04) 100%)'
     },
     craft: {
       name: 'Craft',
@@ -1827,7 +1870,7 @@
       if (r.authors) metaParts.push(r.authors);
       const meta = metaParts.join(' · ');
 
-      return `<div class="typeahead-item" data-index="${i}" data-id="${r.id}" data-title="${(r.title || '').replace(/"/g, '&quot;')}" data-year="${r.year || ''}" data-type="${r.type}">
+      return `<div class="typeahead-item" data-index="${i}" data-id="${r.id}" data-title="${(r.title || '').replace(/"/g, '&quot;')}" data-year="${r.year || ''}" data-type="${r.type}" role="option">
         ${posterHtml}
         <div class="typeahead-info">
           <div class="typeahead-title">${r.title}</div>
@@ -1837,6 +1880,8 @@
     }).join('');
 
     dropdown.classList.add('open');
+    const wrapper = dropdown.closest('.typeahead-wrapper');
+    if (wrapper) wrapper.setAttribute('aria-expanded', 'true');
   }
 
   function selectTypeaheadItem(el) {
@@ -1933,6 +1978,15 @@
       ],
     },
   };
+
+  function closeTypeaheadDropdown() {
+    const dropdown = document.getElementById('qa-dropdown');
+    if (dropdown) {
+      dropdown.classList.remove('open');
+      const wrapper = dropdown.closest('.typeahead-wrapper');
+      if (wrapper) wrapper.setAttribute('aria-expanded', 'false');
+    }
+  }
 
   // ─── Context menu ───
 
@@ -2048,9 +2102,9 @@
         const searchType = f.typeahead === 'book' ? 'book' : 'movie';
         html += `<div class="modal-field">
           <label>${f.label}${f.required ? ' *' : ''}</label>
-          <div class="typeahead-wrapper">
-            <input type="text" name="${f.name}" id="qa-${f.name}" placeholder="${f.placeholder || ''}" ${f.required ? 'required' : ''} autocomplete="off" data-search-type="${searchType}" />
-            <div class="typeahead-dropdown" id="qa-dropdown"></div>
+          <div class="typeahead-wrapper" role="combobox" aria-expanded="false" aria-owns="qa-dropdown" aria-haspopup="listbox">
+            <input type="text" name="${f.name}" id="qa-${f.name}" placeholder="${f.placeholder || ''}" ${f.required ? 'required' : ''} autocomplete="off" data-search-type="${searchType}" role="searchbox" aria-autocomplete="list" aria-controls="qa-dropdown" />
+            <div class="typeahead-dropdown" id="qa-dropdown" role="listbox"></div>
           </div>
           <div class="selected-badge" id="qa-selected-badge" style="display:none;"></div>
         </div>`;
@@ -2303,7 +2357,7 @@
   // ─── Keyboard navigation ───
 
   document.addEventListener('keydown', (e) => {
-    const keys = ['watch', 'kitchen', 'masks', 'brain', 'read', 'world', 'music', 'projects', 'flow', 'craft'];
+    const keys = ['watch', 'kitchen', 'masks', 'brain', 'read', 'world', 'music', 'projects', 'flow', 'watchtower', 'craft'];
     const num = parseInt(e.key);
 
     // Close modal on Escape
