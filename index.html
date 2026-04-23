@@ -84,6 +84,9 @@
   .bg-ambient[data-domain="flow"] { background: radial-gradient(ellipse at 25% 35%, rgba(6,182,212,0.14) 0%, transparent 55%),
                                                 radial-gradient(ellipse at 75% 65%, rgba(59,130,246,0.08) 0%, transparent 55%),
                                                 radial-gradient(ellipse at 60% 80%, rgba(139,92,246,0.06) 0%, transparent 55%); }
+  .bg-ambient[data-domain="craft"] { background: radial-gradient(ellipse at 25% 35%, rgba(245,158,11,0.14) 0%, transparent 55%),
+                                                 radial-gradient(ellipse at 75% 65%, rgba(217,119,6,0.08) 0%, transparent 55%),
+                                                 radial-gradient(ellipse at 60% 80%, rgba(234,88,12,0.06) 0%, transparent 55%); }
 
   /* Floating particles */
   .particles {
@@ -1052,6 +1055,7 @@
   <div class="bg-ambient" data-domain="music"></div>
   <div class="bg-ambient" data-domain="projects"></div>
   <div class="bg-ambient" data-domain="flow"></div>
+  <div class="bg-ambient" data-domain="craft"></div>
   <div class="particles">
     <div class="particle visible"></div>
     <div class="particle visible"></div>
@@ -1119,6 +1123,11 @@
       <span class="tooltip">Flow</span>
       <span class="status-pip live"></span>
     </div>
+    <div class="sidebar-icon" data-domain="craft" data-accent="#f59e0b" data-accent-dim="rgba(245,158,11,0.15)" data-accent-glow="rgba(245,158,11,0.08)" data-href="https://craft.kaleb.one">
+      🛠️
+      <span class="tooltip">Craft</span>
+      <span class="status-pip live"></span>
+    </div>
     <div class="sidebar-spacer"></div>
   </nav>
 
@@ -1141,7 +1150,7 @@
     <div class="default-view" id="defaultView">
       <h1 class="default-title">kaleb.one</h1>
       <p class="default-subtitle">A personal constellation of tools, wikis, and kitchens.</p>
-      <p class="default-hint"><span class="arrow-left">←</span> Select a domain to explore · Press <kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; border: 1px solid rgba(255,255,255,0.1);">1</kbd>-<kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; border: 1px solid rgba(255,255,255,0.1);">9</kbd> · <kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; border: 1px solid rgba(255,255,255,0.1);">n</kbd> to quick-add</p>
+      <p class="default-hint"><span class="arrow-left">←</span> Select a domain to explore · Press <kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; border: 1px solid rgba(255,255,255,0.1);">1</kbd>-<kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; border: 1px solid rgba(255,255,255,0.1);">0</kbd> · <kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; border: 1px solid rgba(255,255,255,0.1);">n</kbd> to quick-add</p>
     </div>
 
     <!-- Domain View (appears on selection) -->
@@ -1546,6 +1555,38 @@
       },
       bars: [90, 75, 60, 85, 70, 55, 80, 65, 95, 50],
       heroGradient: 'linear-gradient(135deg, rgba(6,182,212,0.18) 0%, rgba(59,130,246,0.10) 50%, rgba(139,92,246,0.04) 100%)'
+    },
+    craft: {
+      name: 'Craft',
+      desc: 'Operating procedures & hard-won knowledge from building the kaleb.one ecosystem. Infrastructure, CI/CD, SSG parsing, Liquid Glass design system, and agent orchestration.',
+      href: 'https://craft.kaleb.one',
+      status: 'live',
+      stats: [
+        { value: '7', label: 'Entries' },
+        { value: '40+', label: 'Lessons' },
+        { value: '12', label: 'Domains' }
+      ],
+      recent: {
+        title: 'Topics',
+        count: 7,
+        items: [
+          { icon: '🔑', text: 'Cloudflare Token Triage', meta: 'Infrastructure' },
+          { icon: '⚙️', text: 'CI/CD Pipeline Patterns', meta: 'CI/CD' },
+          { icon: '📝', text: 'SSG Markdown Parsing', meta: 'Parsing' },
+          { icon: '🔒', text: 'D1 & Access APIs', meta: 'Data Layer' },
+          { icon: '🪟', text: 'Liquid Glass Spec', meta: 'Design' }
+        ]
+      },
+      info: {
+        title: 'What\'s Here',
+        items: [
+          { icon: '🛠️', text: 'Hard-won from 12+ builds' },
+          { icon: '📋', text: 'Pitfalls & gotchas' },
+          { icon: '🔐', text: 'Access protected' }
+        ]
+      },
+      bars: [85, 70, 90, 60, 80, 55, 75, 65, 95, 45],
+      heroGradient: 'linear-gradient(135deg, rgba(245,158,11,0.18) 0%, rgba(217,119,6,0.10) 50%, rgba(234,88,12,0.04) 100%)'
     }
   };
 
@@ -2262,7 +2303,7 @@
   // ─── Keyboard navigation ───
 
   document.addEventListener('keydown', (e) => {
-    const keys = ['watch', 'kitchen', 'masks', 'brain', 'read', 'world', 'music', 'projects', 'flow'];
+    const keys = ['watch', 'kitchen', 'masks', 'brain', 'read', 'world', 'music', 'projects', 'flow', 'craft'];
     const num = parseInt(e.key);
 
     // Close modal on Escape
